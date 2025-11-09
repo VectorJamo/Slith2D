@@ -20,6 +20,7 @@ public class VAO {
 	public VAO(float[] vertices, int floatsPerVertex, int attributesPerVertex) {
 		this.floatsPerVertex = floatsPerVertex;
 		this.attributesPerVertex = attributesPerVertex;
+		attributes = new ArrayList<Attribute>();
 		
 		vao = glGenVertexArrays();
 		
@@ -45,7 +46,28 @@ public class VAO {
 	public void createVAO() {
 		// TODO. 
 		// Bind the VAO and VBO
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		
 		// Set the layout
+		int offset = 0;
+		for(int i = 0; i < attributes.size(); i++) {
+			// Uncomment for debugging
+			//System.out.println("Attribute Index: " + i);
+			//System.out.println("Count: " + attributes.get(i).floatsPerAttribute);
+			//System.out.println("Stride: " + floatsPerVertex * Float.BYTES);
+			//System.out.println("Offset: " + offset * Float.BYTES);
+			
+			glEnableVertexAttribArray(i);
+			glVertexAttribPointer(i, attributes.get(i).floatsPerAttribute, GL_FLOAT, false, 
+					floatsPerVertex * Float.BYTES, offset * Float.BYTES);
+			
+			offset += attributes.get(i).floatsPerAttribute;
+		}
+		
+		// Un-bind everything
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	
 	public void bind() {
@@ -55,9 +77,4 @@ public class VAO {
 	public void unbind() {
 		glBindVertexArray(0);
 	}
-	
-	int GetVAO() {
-		return vao;
-	}
-
 }
