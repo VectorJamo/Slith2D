@@ -11,32 +11,40 @@ import java.util.ArrayList;
 
 public class VAO {
 	
-	private int vao, vbo;
+	private int vao, vbo, ibo;
 	
 	private int floatsPerVertex;
 	private int attributesPerVertex;
 	private ArrayList<Attribute> attributes;
 	
-	public VAO(float[] vertices, int floatsPerVertex, int attributesPerVertex) {
+	public VAO(float[] vertices, byte[] indices, int floatsPerVertex, int attributesPerVertex) {
 		this.floatsPerVertex = floatsPerVertex;
 		this.attributesPerVertex = attributesPerVertex;
 		attributes = new ArrayList<Attribute>();
 		
 		vao = glGenVertexArrays();
 		
-		createVBO(vertices);
+		createGLBuffers(vertices, indices);
 	}
 	
-	private void createVBO(float[] vertices) {
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.length);
-		buffer.put(vertices);
-		buffer.flip();
+	private void createGLBuffers(float[] vertices, byte[] indices) {
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length);
+		vertexBuffer.put(vertices);
+		vertexBuffer.flip();
+
+		ByteBuffer indexBuffer = BufferUtils.createByteBuffer(indices.length);
+		indexBuffer.put(indices);
+		indexBuffer.flip();
 		
 		vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
-
+		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+		ibo = glGenBuffers();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
 	public void defineAttribute(int attributeIndex, int floatsPerAttribute) {
@@ -44,10 +52,10 @@ public class VAO {
 	}
 	
 	public void createVAO() {
-		// TODO. 
-		// Bind the VAO and VBO
+		// Bind the VAO, VBO and IBO
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		
 		// Set the layout
 		int offset = 0;
@@ -68,6 +76,7 @@ public class VAO {
 		// Un-bind everything
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
 	public void bind() {

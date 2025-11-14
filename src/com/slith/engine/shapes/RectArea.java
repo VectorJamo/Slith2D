@@ -10,17 +10,17 @@ public class RectArea {
 		this.dimension = dimension;
 	}
 	
-	public void SetPosition(vec2 position) {
+	public void setPosition(vec2 position) {
 		this.position = position;
 	}
-	public void SetDimension(vec2 dimension) {
+	public void setDimension(vec2 dimension) {
 		this.dimension = dimension;
 	}
 	
-	public vec2 GetPosition() {
+	public vec2 getPosition() {
 		return position;
 	}
-	public vec2 GetDimension() {
+	public vec2 getDimension() {
 		return dimension;
 	}
 }

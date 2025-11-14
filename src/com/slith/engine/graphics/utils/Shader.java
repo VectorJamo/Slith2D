@@ -13,6 +13,8 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import com.slith.engine.maths.*;
+
 public class Shader {
 	
 	private String vertexShaderCode, fragmentShaderCode;
@@ -83,15 +85,28 @@ public class Shader {
 		
 		return shader;
 	}
+	private int getUniformLocation(String uniformName) {
+		int uniformLocation = glGetUniformLocation(shaderProgram, (CharSequence)uniformName);
+		if(uniformLocation == -1) {
+			System.out.println("Failed to find uniform: " + uniformName);
+		}
+		return uniformLocation;
+	}
 	public void setUniformVec4f(String uniformName, float[] vec4) {
 		bind();
-		int uniformLocation = glGetUniformLocation(shaderProgram, (CharSequence)uniformName);
-		
-		FloatBuffer vec4Buffer = BufferUtils.createFloatBuffer(4);
-		vec4Buffer.put(vec4);
-		vec4Buffer.flip();
-		
-		glUniform4fv(uniformLocation, vec4Buffer);
+		glUniform4fv(getUniformLocation(uniformName), vec4);
+	}
+	public void setUniformMat4f(String uniformName, mat4 mat) {
+		bind();
+		glUniformMatrix4fv(getUniformLocation(uniformName), true, mat.values);
+	}
+	public void setUniform1i(String uniformName, int value) {
+		bind();
+		glUniform1i(getUniformLocation(uniformName), value);
+	}
+	public void setUniformiv(String uniformName, int[] values) {
+		bind();
+		glUniform1iv(getUniformLocation(uniformName), values);
 	}
 	
 	public void bind() {

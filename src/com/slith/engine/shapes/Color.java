@@ -5,7 +5,7 @@ public class Color {
 	
 	public Color(float r, float g, float b, float a) {
 		this.r = r;
-		this.g = b;
+		this.g = g;
 		this.b = b;
 		this.a = a;
 	}
