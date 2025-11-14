@@ -11,14 +11,10 @@ out vec4 v_Color;
 out vec2 v_textCoord;
 out float v_textIndex;
 
-out vec2 v_FragmentPosition;
-
 void main() {
 	gl_Position =  u_Projection * vec4(position.xy, 0.0, 1.0);
 	
 	v_Color = color;
 	v_textCoord = textCoord;
 	v_textIndex = textIndex;
-
-	v_FragmentPosition = position.xy;
 }	

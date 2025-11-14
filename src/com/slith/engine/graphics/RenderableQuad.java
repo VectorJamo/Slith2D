@@ -94,7 +94,59 @@ public class RenderableQuad {
 	}
 	// TODO
 	public RenderableQuad(RectArea rect, Texture texture, RectArea srcRect, SimpleBatchRenderer batchRenderer) {
+		position = rect.getPosition();
+		size = rect.getDimension();
+		rotationAngle = 0.0f;
 
+		this.texture = texture;
+		
+		// Check if the batch renderer already has the texture from other quads
+		if(batchRenderer.currentTextures.containsKey(texture)) {
+			textureIndex = batchRenderer.currentTextures.get(texture);
+		}else {
+			textureIndex = batchRenderer.numAvailableTextureIndex;
+			batchRenderer.currentTextures.put(texture, textureIndex);
+			
+			batchRenderer.numAvailableTextureIndex++;
+		}
+		
+		// TODO: Calculate the texture coordinates from the srcRect
+		vec2 textureTopLeft = srcRect.getPosition();
+		vec2 textureSize = srcRect.getDimension();
+		float totalTextureWidth = texture.getWidth();
+		float totalTextureHeight = texture.getHeight();
+		
+		float topLeftXNormalized = textureTopLeft.getX()/totalTextureWidth;
+		float topLeftYNormalized = textureTopLeft.getY()/totalTextureHeight;
+		float textureWidthNormalized = textureSize.getX()/totalTextureWidth;
+		float textureHeightNormalized = textureSize.getY()/totalTextureHeight;
+		
+		vec2[] textCoords = new vec2[4];
+		textCoords[0] = new vec2(topLeftXNormalized, (1.0f - topLeftYNormalized));
+		textCoords[1] = new vec2(topLeftXNormalized, 1.0f - (topLeftYNormalized + textureHeightNormalized));
+		textCoords[2] = new vec2(topLeftXNormalized + textureWidthNormalized, 1.0f - (topLeftYNormalized + textureHeightNormalized));
+		textCoords[3] = new vec2(topLeftXNormalized + textureWidthNormalized, (1.0f - topLeftYNormalized));
+
+		// Order is counter clock-wise
+		finalVertices[0] = new Vertex(LocalVertices[0], 
+				new vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+				textCoords[0], 
+				textureIndex);
+		finalVertices[1] = new Vertex(LocalVertices[1], 
+				new vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+				textCoords[1], 
+				textureIndex);
+		finalVertices[2] = new Vertex(LocalVertices[2], 
+				new vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+				textCoords[2], 
+				textureIndex);
+		finalVertices[3] = new Vertex(LocalVertices[3], 
+				new vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+				textCoords[3], 
+				textureIndex);
+		
+		verticesBuffer = BufferUtils.createFloatBuffer(getTotalFloatsPerQuad());
+		calculateFinalVertices();
 	}
 
 	

@@ -20,6 +20,8 @@ import com.slith.engine.shapes.*;
 
 import com.slith.engine.input.*;
 
+import com.slith.engine.ui.*;
+
 public class Application {
 	
 	public Application() {
@@ -27,6 +29,8 @@ public class Application {
 		
 		SimpleBatchRenderer batchRenderer = new SimpleBatchRenderer();
 		Shader batchRendererShader = batchRenderer.getShaderObject();
+		
+		BMPFontRenderer fontRenderer = new BMPFontRenderer("res/images/ConsolasBMP.bmp");
 		
 		// 10K QUADS!
 		int quadWidth = 800/100;
@@ -42,23 +46,23 @@ public class Application {
 			}
 		}
 		
-		Texture texture = new Texture("res/images/wall.jpg");
-		Texture texture2 = new Texture("res/images/minecraft.jpg");
+		Texture texture = new Texture("res/images/wall.jpg", 3);
 		
 		RenderableQuad texturedQuad = new RenderableQuad(new RectArea(new vec2(0.0f, 0.0f), new vec2(100.0f, 100.0f)), texture, batchRenderer);
 		batchRenderer.pushQuad(texturedQuad);
 		
-		RenderableQuad texturedQuad2 = new RenderableQuad(new RectArea(new vec2(100.0f, 200.0f), new vec2(100.0f, 100.0f)), texture2, batchRenderer);
-		batchRenderer.pushQuad(texturedQuad2);
-		
+		Text text = new Text("press G to play", new vec2(200, 200), 32, fontRenderer);
+		fontRenderer.pushText(text);
+
 		while(!window.windowShouldClose()) {
 			window.pollEvents();
 			
 			window.clear();
 			
-			batchRendererShader.setUniformVec2f("u_LightPosition", new float[] {MouseManager.getMouseX(), MouseManager.getMouseY()});
 			batchRenderer.createBatchedBuffers();
 			batchRenderer.drawQuads();
+			
+			fontRenderer.RenderText();
 			
 			window.show();
 		}

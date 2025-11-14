@@ -1,0 +1,67 @@
+package com.slith.engine.ui;
+
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+
+import com.slith.engine.graphics.*;
+import com.slith.engine.maths.*;
+import com.slith.engine.shapes.RectArea;
+
+public class Text {
+	
+	private String text;
+	private ArrayList<RenderableQuad> characterQuads;
+	private static BMPFontRenderer fontRenderer;
+	
+	private vec2 position;
+	private int characterSize;
+	
+	public Text(String text, vec2 position, int charSize, BMPFontRenderer renderer) {
+		this.position = position;
+		characterSize = charSize;
+		fontRenderer = renderer;
+		this.text = text.toUpperCase();
+		
+		characterQuads = new ArrayList<RenderableQuad>();
+		
+		float x = position.getX();
+		float y = position.getY();
+		float width = charSize;
+		float height = charSize;
+		
+		for(int i = 0; i< this.text.length(); i++) {
+			characterQuads.add(createCharacterQuad(new RectArea(new vec2(x, y), new vec2(width, height)), this.text.charAt(i)));
+			x += width;
+		}
+	}
+	
+	public RenderableQuad createCharacterQuad(RectArea destination, char charCode) {
+		RectArea textureArea = getCharPlaceInFont(charCode);
+		
+		// For debugging
+		//System.out.println("For Char: " + (char)(charCode));
+		//System.out.println("X: " + textureArea.getPosition().getX() + ", Y: " + textureArea.getPosition().getY());
+		//System.out.println("WIDTH: " + textureArea.getDimension().getX() + ", HEIGHT: " + textureArea.getDimension().getY());
+		
+		return new RenderableQuad(destination, fontRenderer.getFontTexture(), textureArea, fontRenderer.getRenderer());
+	}
+	
+	public RectArea getCharPlaceInFont(char c) {
+		int x, y, width, height;
+		
+		int index = (int)c - 32;
+		int numRows = 8;
+		int numCols = 8;
+		
+		y = index / numCols;
+		x = index % numCols;
+		width = 32;
+		height = 32;
+		
+		return new RectArea(new vec2(x*32, y*32), new vec2(width, height));
+	}
+	
+	public ArrayList<RenderableQuad> getCharacterQuads() {
+		return characterQuads;
+	}
+}

@@ -24,7 +24,7 @@ public class Texture {
 	private int texture;
 	int width, height, nChannels;
 	
-	public Texture(String texturePath) {
+	public Texture(String texturePath, int channels) {
 		texture = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, texture);
 		
@@ -45,10 +45,70 @@ public class Texture {
 		this.height = height.get();
 		this.nChannels = nChannels.get();
 		
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.width, this.height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+		int type = GL_RGB;
+		if(channels == 4) {
+			type = GL_RGBA;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, type, this.width, this.height, 0, type, GL_UNSIGNED_BYTE, buffer);
 	
 		glBindTexture(GL_TEXTURE_2D, 0);
 		STBImage.stbi_image_free(buffer);
+	}
+	
+	public Texture(RawImage rawImage) {
+		this.width = rawImage.width;
+		this.height = rawImage.height;
+		this.nChannels = rawImage.numChannels;
+		
+		texture = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, texture);
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		int type = GL_RGB;
+		if(rawImage.numChannels == 4) {
+			type = GL_RGBA;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, type, rawImage.width, rawImage.height, 0, type, GL_UNSIGNED_BYTE, rawImage.imageBuffer);
+		
+		
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
+	public static RawImage bmpToPng(RawImage image) {
+		ByteBuffer pngBuffer = BufferUtils.createByteBuffer(image.width*image.height*4);
+		
+		for(int i = 0; i < image.width*image.height; i++) {
+			int r = image.imageBuffer.get(i*3) & 0xff;
+			int g = image.imageBuffer.get(i*3 + 1) & 0xff;
+			int b = image.imageBuffer.get(i*3 + 2) & 0xff;
+			
+			pngBuffer.put(i*4, (byte)r);
+			pngBuffer.put(i*4+1, (byte)g);
+			pngBuffer.put(i*4+2, (byte)b);
+			
+			int a = r | g| b;
+			
+			if(r == 0 && g == 0 && b == 0)
+				pngBuffer.put(i*4+3, (byte)0); 
+			else
+				pngBuffer.put(i*4+3, (byte)255); 
+		}
+		
+		return new RawImage(pngBuffer, image.width, image.height, 4);
+	}
+	public static RawImage getImageBuffer(String path) {
+		STBImage.stbi_set_flip_vertically_on_load(true); // To adhere with OpenGL's texture coordinate standards
+
+		IntBuffer width = BufferUtils.createIntBuffer(1);
+		IntBuffer height = BufferUtils.createIntBuffer(1);
+		IntBuffer nChannels = BufferUtils.createIntBuffer(1);
+		
+		ByteBuffer buffer = STBImage.stbi_load(path, width, height, nChannels, 0);
+		return new RawImage(buffer, width.get(), height.get(), nChannels.get());
 	}
 	
 	public static int createUnitWhiteTexture() {
@@ -82,5 +142,12 @@ public class Texture {
 	public void unbind(int slot) {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	public int getHeight() {
+		return height;
 	}
 }
