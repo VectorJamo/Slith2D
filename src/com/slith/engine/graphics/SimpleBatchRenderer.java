@@ -155,4 +155,8 @@ public class SimpleBatchRenderer {
 
 		glBindVertexArray(0); 
 	}
+	
+	public Shader getShaderObject() {
+		return defaultShader;
+	}
 }

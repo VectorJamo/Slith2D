@@ -12,6 +12,8 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import com.slith.engine.input.*;
+
 public class Window {
 	
 	private long window;
@@ -37,8 +39,14 @@ public class Window {
 		
 		window = glfwCreateWindow(width, height, title, 0, 0);
 		
+		// Input call-backs
+		glfwSetKeyCallback(window, new KeyManager());
+		MouseManager.init(window);
+		
 		glfwMakeContextCurrent(window);
 		createCapabilities();
+
+		glfwSwapInterval(1);
 	}
 	
 	public void pollEvents() {
@@ -51,6 +59,9 @@ public class Window {
 	
 	public void show() {
 		glfwSwapBuffers(window);
+		
+		KeyManager.resetKeys();
+		MouseManager.resetButtons();
 	}
 	
 	public boolean windowShouldClose() {

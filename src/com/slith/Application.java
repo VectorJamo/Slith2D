@@ -18,12 +18,15 @@ import com.slith.engine.graphics.utils.*;
 import com.slith.engine.maths.*;
 import com.slith.engine.shapes.*;
 
+import com.slith.engine.input.*;
+
 public class Application {
 	
 	public Application() {
 		Window window = new Window(800, 600, "Slith Engine");
 		
 		SimpleBatchRenderer batchRenderer = new SimpleBatchRenderer();
+		Shader batchRendererShader = batchRenderer.getShaderObject();
 		
 		// 10K QUADS!
 		int quadWidth = 800/100;
@@ -41,6 +44,7 @@ public class Application {
 		
 		Texture texture = new Texture("res/images/wall.jpg");
 		Texture texture2 = new Texture("res/images/minecraft.jpg");
+		
 		RenderableQuad texturedQuad = new RenderableQuad(new RectArea(new vec2(0.0f, 0.0f), new vec2(100.0f, 100.0f)), texture, batchRenderer);
 		batchRenderer.pushQuad(texturedQuad);
 		
@@ -52,6 +56,7 @@ public class Application {
 			
 			window.clear();
 			
+			batchRendererShader.setUniformVec2f("u_LightPosition", new float[] {MouseManager.getMouseX(), MouseManager.getMouseY()});
 			batchRenderer.createBatchedBuffers();
 			batchRenderer.drawQuads();
 			

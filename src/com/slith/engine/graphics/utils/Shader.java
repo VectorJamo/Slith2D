@@ -96,6 +96,10 @@ public class Shader {
 		bind();
 		glUniform4fv(getUniformLocation(uniformName), vec4);
 	}
+	public void setUniformVec2f(String uniformName, float[] vec2) {
+		bind();
+		glUniform2fv(getUniformLocation(uniformName), vec2);
+	}
 	public void setUniformMat4f(String uniformName, mat4 mat) {
 		bind();
 		glUniformMatrix4fv(getUniformLocation(uniformName), true, mat.values);
