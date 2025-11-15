@@ -22,6 +22,9 @@ public class Window {
 	private int width, height;
 	private String title;
 	
+	// For FPS
+	private double lastTime = 0.0, deltaTime = 0.0;
+	
 	public Window(int width, int height, String title) {
 		this.width = width;
 		this.height = height;
@@ -46,13 +49,17 @@ public class Window {
 		glfwMakeContextCurrent(window);
 		createCapabilities();
 
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	public void pollEvents() {
+		double currentTime = glfwGetTime();
+		deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+		
 		glfwPollEvents();
 	}
 	
@@ -69,5 +76,9 @@ public class Window {
 	
 	public boolean windowShouldClose() {
 		return glfwWindowShouldClose(window);
+	}
+	
+	public double getDeltaTime() {
+		return deltaTime;
 	}
 }

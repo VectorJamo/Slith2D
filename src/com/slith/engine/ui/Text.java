@@ -5,19 +5,22 @@ import java.util.ArrayList;
 
 import com.slith.engine.graphics.*;
 import com.slith.engine.maths.*;
+import com.slith.engine.shapes.Color;
 import com.slith.engine.shapes.RectArea;
 
 public class Text {
 	
 	private String text;
+	private Color color;
 	private ArrayList<RenderableQuad> characterQuads;
 	private static BMPFontRenderer fontRenderer;
 	
 	private vec2 position;
 	private int characterSize;
 	
-	public Text(String text, vec2 position, int charSize, BMPFontRenderer renderer) {
+	public Text(String text, vec2 position, int charSize, Color color, BMPFontRenderer renderer) {
 		this.position = position;
+		this.color = color;
 		characterSize = charSize;
 		fontRenderer = renderer;
 		this.text = text.toUpperCase();
@@ -30,12 +33,27 @@ public class Text {
 		float height = charSize;
 		
 		for(int i = 0; i< this.text.length(); i++) {
-			characterQuads.add(createCharacterQuad(new RectArea(new vec2(x, y), new vec2(width, height)), this.text.charAt(i)));
+			characterQuads.add(createCharacterQuad(new RectArea(new vec2(x, y), new vec2(width, height)), this.text.charAt(i), color));
 			x += width;
 		}
 	}
 	
-	public RenderableQuad createCharacterQuad(RectArea destination, char charCode) {
+	public void setText(String text) {
+		characterQuads.clear();
+		this.text = text.toUpperCase();
+		
+		float x = position.getX();
+		float y = position.getY();
+		float width = characterSize;
+		float height = characterSize;
+		
+		for(int i = 0; i < this.text.length(); i++) {
+			characterQuads.add(createCharacterQuad(new RectArea(new vec2(x, y), new vec2(width, height)), this.text.charAt(i), color));
+			x += width;
+		}
+	}
+	
+	public RenderableQuad createCharacterQuad(RectArea destination, char charCode, Color color) {
 		RectArea textureArea = getCharPlaceInFont(charCode);
 		
 		// For debugging
@@ -43,7 +61,7 @@ public class Text {
 		//System.out.println("X: " + textureArea.getPosition().getX() + ", Y: " + textureArea.getPosition().getY());
 		//System.out.println("WIDTH: " + textureArea.getDimension().getX() + ", HEIGHT: " + textureArea.getDimension().getY());
 		
-		return new RenderableQuad(destination, fontRenderer.getFontTexture(), textureArea, fontRenderer.getRenderer());
+		return new RenderableQuad(destination, fontRenderer.getFontTexture(), textureArea, fontRenderer.getRenderer(), color);
 	}
 	
 	public RectArea getCharPlaceInFont(char c) {

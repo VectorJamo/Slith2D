@@ -65,8 +65,8 @@ public class Texture {
 		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 		int type = GL_RGB;
 		if(rawImage.numChannels == 4) {
@@ -133,6 +133,25 @@ public class Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		
 		return unitTexture;
+	}
+	
+	public static vec2[] getTextureCoords(RectArea area, int textureWidth, int textureHeight) {
+		vec2 textureTopLeft = area.getPosition();
+		vec2 textureSize = area.getDimension();
+		
+		float topLeftXNormalized = textureTopLeft.getX()/textureWidth;
+		float topLeftYNormalized = textureTopLeft.getY()/textureHeight;
+		float textureWidthNormalized = textureSize.getX()/textureWidth;
+		float textureHeightNormalized = textureSize.getY()/textureHeight;
+		
+		vec2[] textCoords = new vec2[4];
+
+		textCoords[0] = new vec2(topLeftXNormalized, (1.0f - topLeftYNormalized));
+		textCoords[1] = new vec2(topLeftXNormalized, 1.0f - (topLeftYNormalized + textureHeightNormalized));
+		textCoords[2] = new vec2(topLeftXNormalized + textureWidthNormalized, 1.0f - (topLeftYNormalized + textureHeightNormalized));
+		textCoords[3] = new vec2(topLeftXNormalized + textureWidthNormalized, (1.0f - topLeftYNormalized));
+
+		return textCoords;
 	}
 	
 	public void bind(int slot) {

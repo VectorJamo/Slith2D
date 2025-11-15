@@ -25,7 +25,7 @@ import com.slith.engine.shapes.*;
 public class SimpleBatchRenderer {
 
 	private int vao, vbo, ibo;
-	private Shader defaultShader;
+	private Shader defaultShader, currentShader;
 	protected mat4 projectionMatrix;
 	
 	private static int unitWhiteTexture;
@@ -53,8 +53,9 @@ public class SimpleBatchRenderer {
 		defaultShader = new Shader("res/shaders/default_shaders/batch_rendering/vs.glsl", "res/shaders/default_shaders/batch_rendering/fs.glsl");
 		projectionMatrix = mat4.createOrthographic(0.0f, 800.0f, 0.0f, 600.0f);
 		
-		defaultShader.setUniformMat4f("u_Projection", projectionMatrix);
-		defaultShader.setUniformiv("u_Textures", new int[] {0, 1, 2, 3, 4, 5, 6, 7});
+		currentShader = defaultShader;
+		currentShader.setUniformMat4f("u_Projection", projectionMatrix);
+		currentShader.setUniformiv("u_Textures", new int[] {0, 1, 2, 3, 4, 5, 6, 7});
 		
 		// Textures
 		unitWhiteTexture = Texture.createUnitWhiteTexture();
@@ -148,7 +149,7 @@ public class SimpleBatchRenderer {
 	
 	public void drawQuads() {
 		glBindVertexArray(vao);
-		defaultShader.bind();
+		currentShader.bind();
 		bindTextures();
 		
 		glDrawElements(GL_TRIANGLES, quads.size()*6, GL_UNSIGNED_SHORT, 0);
@@ -157,6 +158,12 @@ public class SimpleBatchRenderer {
 	}
 	
 	public Shader getShaderObject() {
+		return currentShader;
+	}
+	public Shader getDefaultShader() {
 		return defaultShader;
+	}
+	public ArrayList<RenderableQuad> getQuadBuffer() {
+		return quads;
 	}
 }
