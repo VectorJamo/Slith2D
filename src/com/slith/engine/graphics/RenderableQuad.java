@@ -20,12 +20,16 @@ public class RenderableQuad {
 	private vec2 position;
 	private vec2 size;
 	private float rotationAngle;
+
+	vec2 invertY = new vec2(1.0f, -1.0f);
+	vec2 translation =  new vec2(0.0f, 0.0f);
+	vec2[] finalPositions = new vec2[4];
 	
 	private Vertex[] finalVertices = new Vertex[4];
 	private FloatBuffer verticesBuffer;
 	
 	private Texture texture = null;
-	private int textureIndex = -1;
+	private int textureIndex = 0;
 		
 	public RenderableQuad(RectArea rect, Color color) {
 		position = rect.getPosition();
@@ -36,30 +40,42 @@ public class RenderableQuad {
 		finalVertices[0] = new Vertex(LocalVertices[0], 
 				new vec4(color.r, color.g, color.b, color.a), 
 				new vec2(0.0f, 1.0f), 
-				0.0f);
+				textureIndex);
 		finalVertices[1] = new Vertex(LocalVertices[1], 
 				new vec4(color.r, color.g, color.b, color.a), 
 				new vec2(0.0f, 0.0f), 
-				0.0f);
+				textureIndex);
 		finalVertices[2] = new Vertex(LocalVertices[2], 
 				new vec4(color.r, color.g, color.b, color.a), 
 				new vec2(1.0f, 0.0f), 
-				0.0f);
+				textureIndex);
 		finalVertices[3] = new Vertex(LocalVertices[3], 
 				new vec4(color.r, color.g, color.b, color.a), 
 				new vec2(1.0f, 1.0f), 
-				0.0f);
+				textureIndex);
+		
+		finalPositions[0] = new vec2(0.0f, 0.0f);
+		finalPositions[1] = new vec2(0.0f, 0.0f);
+		finalPositions[2] = new vec2(0.0f, 0.0f);
+		finalPositions[3] = new vec2(0.0f, 0.0f);
+
 		
 		verticesBuffer = BufferUtils.createFloatBuffer(getTotalFloatsPerQuad());
 		calculateFinalVertices();
 	}
-	// TODO
+
 	public RenderableQuad(RectArea rect, Texture texture, SimpleBatchRenderer batchRenderer) {
 		position = rect.getPosition();
 		size = rect.getDimension();
 		rotationAngle = 0.0f;
 
 		this.texture = texture;
+		
+		finalPositions[0] = new vec2(0.0f, 0.0f);
+		finalPositions[1] = new vec2(0.0f, 0.0f);
+		finalPositions[2] = new vec2(0.0f, 0.0f);
+		finalPositions[3] = new vec2(0.0f, 0.0f);
+
 		
 		// Check if the batch renderer already has the texture from other quads
 		if(batchRenderer.currentTextures.containsKey(texture)) {
@@ -92,7 +108,6 @@ public class RenderableQuad {
 		verticesBuffer = BufferUtils.createFloatBuffer(getTotalFloatsPerQuad());
 		calculateFinalVertices();
 	}
-	// TODO
 	public RenderableQuad(RectArea rect, Texture texture, RectArea srcRect, SimpleBatchRenderer batchRenderer) {
 		position = rect.getPosition();
 		size = rect.getDimension();
@@ -100,10 +115,15 @@ public class RenderableQuad {
 
 		this.texture = texture;
 		
+		finalPositions[0] = new vec2(0.0f, 0.0f);
+		finalPositions[1] = new vec2(0.0f, 0.0f);
+		finalPositions[2] = new vec2(0.0f, 0.0f);
+		finalPositions[3] = new vec2(0.0f, 0.0f);
+		
 		// Check if the batch renderer already has the texture from other quads
 		if(batchRenderer.currentTextures.containsKey(texture)) {
 			textureIndex = batchRenderer.currentTextures.get(texture);
-		}else {
+		}else{
 			textureIndex = batchRenderer.numAvailableTextureIndex;
 			batchRenderer.currentTextures.put(texture, textureIndex);
 			
@@ -140,6 +160,12 @@ public class RenderableQuad {
 		rotationAngle = 0.0f;
 
 		this.texture = texture;
+		
+		finalPositions[0] = new vec2(0.0f, 0.0f);
+		finalPositions[1] = new vec2(0.0f, 0.0f);
+		finalPositions[2] = new vec2(0.0f, 0.0f);
+		finalPositions[3] = new vec2(0.0f, 0.0f);
+
 		
 		// Check if the batch renderer already has the texture from other quads
 		if(batchRenderer.currentTextures.containsKey(texture)) {
@@ -189,16 +215,24 @@ public class RenderableQuad {
 		verticesBuffer = BufferUtils.createFloatBuffer(getTotalFloatsPerQuad());
 		calculateFinalVertices();
 	}
+	
+	public void setTextureRect(RectArea srcRect) {
+		vec2[] textCoords = Texture.getTextureCoords(srcRect, texture.getWidth(), texture.getHeight());
 
+		finalVertices[0].setTextureCoord(textCoords[0]);
+		finalVertices[1].setTextureCoord(textCoords[1]);
+		finalVertices[2].setTextureCoord(textCoords[2]);
+		finalVertices[3].setTextureCoord(textCoords[3]);
+		
+		putIntoLocalBuffer();
+	}
 	
 	public void calculateFinalVertices() {
 		// 1: Scale the vertices
-		vec2[] finalPositions = new vec2[4];
-		
-		finalPositions[0] = LocalVertices[0].multiply(size);
-		finalPositions[1] = LocalVertices[1].multiply(size);
-		finalPositions[2] = LocalVertices[2].multiply(size);
-		finalPositions[3] = LocalVertices[3].multiply(size);
+		vec2.multiply(finalPositions[0], LocalVertices[0], size);
+		vec2.multiply(finalPositions[1], LocalVertices[1], size);
+		vec2.multiply(finalPositions[2], LocalVertices[2], size);
+		vec2.multiply(finalPositions[3], LocalVertices[3], size);
 		
 		// 2: Rotate the vertices
 		if(rotationAngle != 0.0f) {
@@ -206,21 +240,26 @@ public class RenderableQuad {
 		}
 		
 		// 3: Local space -> World space (Origin is top left, Y-axis is inverted)
-		
+		translation.setX(size.getX()/2);
+		translation.setY(size.getY()/2);
+
 		// Invert the Y in the coordinate space
-		vec2 invertY = new vec2(1.0f, -1.0f);
 		// Translate to make (0, 0) the left-most vertex
-		vec2 translation = new vec2(size.getX()/2, size.getY()/2);
-		finalPositions[0] = (finalPositions[0].multiply(invertY)).add(translation);
-		finalPositions[1] = (finalPositions[1].multiply(invertY)).add(translation);
-		finalPositions[2] = (finalPositions[2].multiply(invertY)).add(translation);
-		finalPositions[3] = (finalPositions[3].multiply(invertY)).add(translation);
+		vec2.multiply(finalPositions[0], finalPositions[0], invertY);
+		vec2.multiply(finalPositions[1], finalPositions[1], invertY);
+		vec2.multiply(finalPositions[2], finalPositions[2], invertY);
+		vec2.multiply(finalPositions[3], finalPositions[3], invertY);
+		
+		vec2.add(finalPositions[0], finalPositions[0], translation);
+		vec2.add(finalPositions[1], finalPositions[1], translation);
+		vec2.add(finalPositions[2], finalPositions[2], translation);
+		vec2.add(finalPositions[3], finalPositions[3], translation);
 		
 		// Translate the vertices
-		finalPositions[0] = finalPositions[0].add(position);
-		finalPositions[1] = finalPositions[1].add(position);
-		finalPositions[2] = finalPositions[2].add(position);
-		finalPositions[3] = finalPositions[3].add(position);
+		vec2.add(finalPositions[0], finalPositions[0], position);
+		vec2.add(finalPositions[1], finalPositions[1], position);
+		vec2.add(finalPositions[2], finalPositions[2], position);
+		vec2.add(finalPositions[3], finalPositions[3], position);
 		
 		finalVertices[0].setPosition(finalPositions[0]);
 		finalVertices[1].setPosition(finalPositions[1]);

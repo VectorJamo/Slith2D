@@ -25,6 +25,9 @@ public class Vertex {
 	public void setPosition(vec2 position) {
 		this.position = position;
 	}
+	public void setTextureCoord(vec2 textCoord) {
+		this.textCoord = textCoord;
+	}
 	
 	public vec2 getPosition() {
 		return position;

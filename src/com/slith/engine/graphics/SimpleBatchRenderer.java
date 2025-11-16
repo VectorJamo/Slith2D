@@ -43,7 +43,7 @@ public class SimpleBatchRenderer {
 	public SimpleBatchRenderer() {
 		quads = new ArrayList<RenderableQuad>();
 		
-		quadVertexBuffer= BufferUtils.createFloatBuffer(RenderableQuad.getTotalFloatsPerQuad()*MAX_QUADS_PER_BATCH);
+		quadVertexBuffer = BufferUtils.createFloatBuffer(RenderableQuad.getTotalFloatsPerQuad()*MAX_QUADS_PER_BATCH);
 		quadIndexBuffer = BufferUtils.createShortBuffer(6*MAX_QUADS_PER_BATCH);
 		
 		// Buffers
@@ -59,6 +59,13 @@ public class SimpleBatchRenderer {
 		
 		// Textures
 		unitWhiteTexture = Texture.createUnitWhiteTexture();
+	}
+	
+	public void setShader(Shader shader) {
+		currentShader = shader;
+
+		currentShader.setUniformMat4f("u_Projection", projectionMatrix);
+		currentShader.setUniformiv("u_Textures", new int[] {0, 1, 2, 3, 4, 5, 6, 7});
 	}
 	
 	public void createOpenGLBuffers() {
@@ -90,6 +97,9 @@ public class SimpleBatchRenderer {
 	
 	public void pushQuad(RenderableQuad quad) {
 		quads.add(quad);
+	}
+	public void removeQuad(RenderableQuad quad) {
+		quads.remove(quad);
 	}
 	
 	public void createBatchedBuffers() {
@@ -148,6 +158,8 @@ public class SimpleBatchRenderer {
 	}
 	
 	public void drawQuads() {
+		createBatchedBuffers();
+		
 		glBindVertexArray(vao);
 		currentShader.bind();
 		bindTextures();
@@ -155,6 +167,10 @@ public class SimpleBatchRenderer {
 		glDrawElements(GL_TRIANGLES, quads.size()*6, GL_UNSIGNED_SHORT, 0);
 
 		glBindVertexArray(0); 
+	}
+	
+	public void clearQuads() {
+		quads.clear();
 	}
 	
 	public Shader getShaderObject() {

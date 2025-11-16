@@ -81,4 +81,11 @@ public class Window {
 	public double getDeltaTime() {
 		return deltaTime;
 	}
+	
+	public int getWidth() {
+		return width;
+	}
+	public int getHeight() {
+		return height;
+	}
 }

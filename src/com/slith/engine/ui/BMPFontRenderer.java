@@ -40,6 +40,7 @@ public class BMPFontRenderer {
 	
 	
 	public void RenderText() {
+		batchTexts();
 		renderer.drawQuads();
 	}
 	
