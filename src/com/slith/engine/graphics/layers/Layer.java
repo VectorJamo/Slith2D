@@ -15,7 +15,7 @@ public abstract class Layer {
 		shader = new Shader("res/shaders/default_shaders/batch_rendering/vs.glsl", 
 				"res/shaders/default_shaders/batch_rendering/fs.glsl");
 		
-		batchRenderer = new SimpleBatchRenderer();
+		batchRenderer = new SimpleBatchRenderer(window);
 	}
 	
 	public abstract void update();

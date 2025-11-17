@@ -16,7 +16,7 @@ public class UI_Utilities {
 	public static void Init(Window window) {
 		UI_Utilities.window = window;
 		
-		fontRenderer = new BMPFontRenderer("res/images/ConsolasBMP.bmp");
+		fontRenderer = new BMPFontRenderer(window, "res/images/ConsolasBMP.bmp");
 		
 		fpsText = new Text("FPS: ", new vec2(0.0f, 0.0f), 24, new Color(1.0f, 1.0f, 1.0f, 1.0f), fontRenderer);
 		fontRenderer.pushText(fpsText);
@@ -37,6 +37,6 @@ public class UI_Utilities {
 		}
 	}
 	public static void RenderFPS() {
-		fontRenderer.RenderText();
+		fontRenderer.renderText();
 	}
 }

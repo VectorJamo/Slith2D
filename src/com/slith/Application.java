@@ -33,7 +33,7 @@ public class Application {
 	public Application() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
 		Window window = new Window(800, 600, "Slith Engine");
 		
-		BMPFontRenderer fontRenderer = new BMPFontRenderer("res/images/ConsolasBMP.bmp");
+		BMPFontRenderer fontRenderer = new BMPFontRenderer(window, "res/images/ConsolasBMP.bmp");
 		Text fpsText = new Text("FPS: ", new vec2(10.0f, 10.0f), 18, new Color(1.0f, 1.0f, 0.0f, 1.0f), fontRenderer);
 		fontRenderer.pushText(fpsText);
 		
@@ -66,7 +66,7 @@ public class Application {
 			}
 
 			fontRenderer.batchTexts();
-			fontRenderer.RenderText();
+			fontRenderer.renderText();
 
 			window.show();
 		}

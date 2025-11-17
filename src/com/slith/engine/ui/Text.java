@@ -13,7 +13,7 @@ public class Text {
 	private String text;
 	private Color color;
 	private ArrayList<RenderableQuad> characterQuads;
-	private static BMPFontRenderer fontRenderer;
+	private BMPFontRenderer fontRenderer;
 	
 	private vec2 position;
 	private int characterSize;
@@ -22,7 +22,7 @@ public class Text {
 		this.position = position;
 		this.color = color;
 		characterSize = charSize;
-		fontRenderer = renderer;
+		this.fontRenderer = renderer;
 		this.text = text.toUpperCase();
 		
 		characterQuads = new ArrayList<RenderableQuad>();
@@ -81,5 +81,9 @@ public class Text {
 	
 	public ArrayList<RenderableQuad> getCharacterQuads() {
 		return characterQuads;
+	}
+	
+	public String getText() {
+		return text;
 	}
 }

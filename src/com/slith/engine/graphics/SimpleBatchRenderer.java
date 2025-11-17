@@ -36,11 +36,13 @@ public class SimpleBatchRenderer {
 	
 	public static final int MAX_QUADS_PER_BATCH = 12000;
 	
+	public static boolean debug = false;
+	
 	// Texture to texture index map
 	public HashMap<Texture, Integer> currentTextures = new HashMap<Texture, Integer>();
 	public int numAvailableTextureIndex = 1;
 	
-	public SimpleBatchRenderer() {
+	public SimpleBatchRenderer(Window window) {
 		quads = new ArrayList<RenderableQuad>();
 		
 		quadVertexBuffer = BufferUtils.createFloatBuffer(RenderableQuad.getTotalFloatsPerQuad()*MAX_QUADS_PER_BATCH);
@@ -51,7 +53,7 @@ public class SimpleBatchRenderer {
 		
 		// Shaders
 		defaultShader = new Shader("res/shaders/default_shaders/batch_rendering/vs.glsl", "res/shaders/default_shaders/batch_rendering/fs.glsl");
-		projectionMatrix = mat4.createOrthographic(0.0f, 800.0f, 0.0f, 600.0f);
+		projectionMatrix = mat4.createOrthographic(0.0f, window.getWidth(), 0.0f, window.getHeight());
 		
 		currentShader = defaultShader;
 		currentShader.setUniformMat4f("u_Projection", projectionMatrix);
@@ -112,14 +114,26 @@ public class SimpleBatchRenderer {
 	}
 	
 	private void createBatchedVertexBuffer() {
+		
 		quadVertexBuffer.clear();
 		
 		// Loop over all the quads
+		//if(debug)
+			//System.out.println("--------ANOTHER BATCH----------");
 		for(int i = 0; i < quads.size(); i++) {
-			RenderableQuad quad = quads.get(i);			
+			RenderableQuad quad = quads.get(i);
+			//if(debug) {
+				//System.out.println("Quad to be drawn at:" +
+						//quads.get(i).getPositions().getX() + ", " + quads.get(i).getPositions().getY());
+			//}
 			quad.putIntoBuffer(quadVertexBuffer);
+			//if(debug) {
+				//System.out.println("Final Position: " + quadVertexBuffer.position());
+			//}
 		}
+
 		quadVertexBuffer.flip();
+		
 		
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, quadVertexBuffer);
@@ -140,6 +154,11 @@ public class SimpleBatchRenderer {
 			quadIndexBuffer.put((short)(3 + i*4));
 			quadIndexBuffer.put((short)(0 + i*4));
 		}
+		//if(debug) {
+			//System.out.println(quads.size());
+			
+			//System.out.println("Final INDEX Position: " + quadIndexBuffer.position());
+		//}
 		quadIndexBuffer.flip();
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

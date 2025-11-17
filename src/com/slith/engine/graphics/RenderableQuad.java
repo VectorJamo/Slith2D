@@ -21,9 +21,9 @@ public class RenderableQuad {
 	private vec2 size;
 	private float rotationAngle;
 
-	vec2 invertY = new vec2(1.0f, -1.0f);
-	vec2 translation =  new vec2(0.0f, 0.0f);
-	vec2[] finalPositions = new vec2[4];
+	private vec2 invertY = new vec2(1.0f, -1.0f);
+	private vec2 translation =  new vec2(0.0f, 0.0f);
+	private vec2[] finalPositions = new vec2[4];
 	
 	private Vertex[] finalVertices = new Vertex[4];
 	private FloatBuffer verticesBuffer;
@@ -175,6 +175,7 @@ public class RenderableQuad {
 			batchRenderer.currentTextures.put(texture, textureIndex);
 			
 			batchRenderer.numAvailableTextureIndex++;
+			System.out.println(textureIndex);
 		}
 		
 		// TODO: Calculate the texture coordinates from the srcRect
@@ -287,7 +288,12 @@ public class RenderableQuad {
 	}
 	
 	public void putIntoBuffer(FloatBuffer buffer) {
-		buffer.put(verticesBuffer);
+		
+		//buffer.put(verticesBuffer); -> NEVER DO THIS. WASTED a WHOLE DAY FIXING BUFFER ISSUES BECAUSE OF THIS SHIT!
+		// IF YOU WISH TO COPY A BUFFER INTO ANOTHER, COPY ITS ELEMENTS MANUALLY!
+	    for (int i = 0; i < verticesBuffer.limit(); i++) {
+	        buffer.put(verticesBuffer.get(i));
+	    }
 	}
 	
 	public void setPosition(vec2 position) {
@@ -297,10 +303,16 @@ public class RenderableQuad {
 		this.size = size;
 	}
 	
+	public vec2 getPositions() {
+		return position;
+	}
+	
 	public Vertex[] getQuadVertices() {
 		return finalVertices;
 	}
-	
+	public FloatBuffer getVerticesBuffer() {
+		return verticesBuffer;
+	}
 	public static int getQuadSize() {
 		return Vertex.getVertexSize()*4;
 	}
