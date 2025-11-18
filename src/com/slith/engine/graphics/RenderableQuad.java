@@ -298,9 +298,13 @@ public class RenderableQuad {
 	
 	public void setPosition(vec2 position) {
 		this.position = position;
+		
+		calculateFinalVertices();
 	}
 	public void setSize(vec2 size) {
 		this.size = size;
+
+		calculateFinalVertices();
 	}
 	
 	public vec2 getPositions() {
