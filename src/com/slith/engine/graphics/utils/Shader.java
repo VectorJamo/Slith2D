@@ -112,6 +112,10 @@ public class Shader {
 		bind();
 		glUniform1iv(getUniformLocation(uniformName), values);
 	}
+	public void setUniformBool(String uniformName, int value) {
+		bind();
+		glUniform1i(getUniformLocation(uniformName), value);
+	}
 	
 	public void bind() {
 		glUseProgram(shaderProgram);
