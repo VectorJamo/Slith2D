@@ -77,6 +77,9 @@ public class Window {
 	public boolean windowShouldClose() {
 		return glfwWindowShouldClose(window);
 	}
+	public void setWindowShouldClose() {
+		glfwSetWindowShouldClose(window, true);
+	}
 	
 	public double getDeltaTime() {
 		return deltaTime;

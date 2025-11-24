@@ -10,8 +10,10 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.util.Arrays;
 
 public class MouseManager {
-	private static boolean[] mouseButtonPressed = new boolean[3];
-	private static boolean[] mouseButtonReleased = new boolean[3];
+	private static final int MAX_BUTTONS = 3;
+	
+	private static boolean[] mouseButtonPressed = new boolean[MAX_BUTTONS];
+	private static boolean[] mouseButtonReleased = new boolean[MAX_BUTTONS];
 	
 	private static int mousePosX, mousePosY;
 	private static boolean isMouseInside = false;

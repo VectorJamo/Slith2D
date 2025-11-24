@@ -10,9 +10,11 @@ import static org.lwjgl.glfw.GLFW.*;
 import java.util.Arrays;
 
 public class KeyManager extends GLFWKeyCallback {
-	private static boolean[] keysPressed = new boolean[256];
-	private static boolean[] keysHold = new boolean[256];
-	private static boolean[] keysReleased = new boolean[256];
+	private static final int MAX_KEYS = 300;
+	
+	private static boolean[] keysPressed = new boolean[MAX_KEYS];
+	private static boolean[] keysHold = new boolean[MAX_KEYS];
+	private static boolean[] keysReleased = new boolean[MAX_KEYS];
 	
 	@Override
 	public void invoke(long window, int key, int scancode, int action, int mods) {
